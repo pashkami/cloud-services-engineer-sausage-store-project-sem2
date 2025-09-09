@@ -1,13 +1,14 @@
 global:
   imagePullPolicy: Always
+  environment: production
+
   ###vault:
   ###  host: ip
   ###  name: vault
   ###  vaultToken: someToken
 
-
 frontend:
-### В чарте frontend отсутствуют некоторые важные файлы. Поймите какие и опишите их.
+  ### В чарте frontend отсутствуют некоторые важные файлы. Поймите какие и опишите их.
   replicas: 1
   revisionHistoryLimit: 15
   strategy:
@@ -15,11 +16,14 @@ frontend:
   service:
     port: 80
   ingress:
-    host: YOUR_STUDENT_HOSTNAME.students-projects.ru # Корректный домен будет указан в задании
+    host: front-560459702.2sem.students-projects.ru # Корректный домен будет указан в задании
     path: /
     pathType: Prefix
+  tls:
+    enabled: true
+    secretName: 2sem-students-projects-wildcard-secret
   containerPort: 80
-  image: YOUR_DOCKERHUB/sausage-frontend:latest
+  image: pashkami/sausage-frontend:latest
   resources:
     requests:
       memory: "128Mi"
@@ -44,9 +48,13 @@ backend:
     port: 8080
   revisionHistoryLimit: 15
   replicas: 1
-  strategy:
   ### Опишите стратегию RollingUpdate для бэкенда
-  image: YOUR_DOCKERHUB/sausage-backend:latest
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  image: pashkami/sausage-backend:latest
   imagePullPolicy: Always
   resources:
     requests:
@@ -57,22 +65,83 @@ backend:
       cpu: "1"
   containerPort: 8080
   livenessProbe:
-  ### Опишите LivenessProbe для бэкенда
+    httpGet:
+      path: /actuator/health
+      port: 8080
+    initialDelaySeconds: 10
+    periodSeconds: 10
+    failureThreshold: 3
+    successThreshold: 1
+    timeoutSeconds: 2
   vpa:
-  ### Опишите VPA для бэкенда
+    enabled: false
+    updateMode: "Off"
+    minAllowed:
+      cpu: 100m
+      memory: 128Mi
+    maxAllowed:
+      cpu: 1000m
+      memory: 1Gi
 
-backend-report:
 ### Опишите значения для backend-report
 ### Приложение должно использовать стратегию Recreate
-### Приложение использует переменную PORT - порт, на котором оно запустится и DB - Uri-подключение к mongodb. 
+### Приложение использует переменную PORT - порт, на котором оно запустится и DB - Uri-подключение к mongodb.
 ### DB положите в Secret, PORT в ConfigMap
 ### Опишите HPA для backend-report
-
+backend-report:
+  strategy:
+    type: Recreate
+  image: pashkami/sausage-backend-report
+  imagePullPolicy: Always
+  containerPort: 8081
+  config:
+    port: "8081"
+  secret:
+    db: "mongodb://root:rootpassword@mongodb:27017"
+  service:
+    type: ClusterIP
+    port: 8081
+  hpa:
+    enabled: true
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 75
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "250m"
+      memory: "256Mi"
 infra:
   postgresql:
-  ### Опишите необходимые переменные для развертывания PostgresQL в кластере Kubernetes
+    ### Опишите необходимые переменные для развертывания PostgresQL в кластере Kubernetes
+    auth:
+      username: store
+      password: storepassword
+      database: sausage-store
+    primary:
+      persistence:
+        enabled: true
+        size: 2Gi
+    architecture: standalone
+    containerPort: 5432
   mongodb:
     env:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: rootpassword
+    service:
+      port: 27017
+      type: ClusterIP
+    persistence:
+      enabled: true
+      size: 1Gi
+      storageClass: ""
+    resources:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
     containerPort: 27017
