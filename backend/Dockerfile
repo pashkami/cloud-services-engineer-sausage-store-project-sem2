@@ -4,6 +4,8 @@
 # build
 FROM maven:3.8.2-openjdk-16-slim AS builder
 # задаём переменную VERSION, которая будет использоваться для сборки проекта
+ARG SPRING_PROFILE=test
+ENV SPRING_PROFILE=${SPRING_PROFILE}
 ARG VERSION=${VERSION}
 WORKDIR /usr/src/app
 COPY ./src ./src
@@ -15,6 +17,7 @@ RUN mvn package -Dversion.application=${VERSION}
 FROM openjdk:16-jdk-alpine
 ARG VERSION=${VERSION}
 WORKDIR /app
+ENV REPORT_PATH=/logs/reports
 # создаём пользователя jaruser
 RUN addgroup --system jaruser \
     && adduser -S -s /bin/false -G jaruser jaruser -D -H \
@@ -28,4 +31,4 @@ COPY --chown=jaruser:jaruser \
 EXPOSE 8080
 # приложение будет запускаться под пользователем jaruser
 USER jaruser
-ENTRYPOINT ["dumb-init", "java", "-jar", "-Dmyserver.bindPort=8080", "./sausage-store.jar"]
+ENTRYPOINT ["dumb-init", "java", "-jar", "-Dspring.profiles.active=test", "-Dmyserver.bindPort=8080", "./sausage-store.jar"]
