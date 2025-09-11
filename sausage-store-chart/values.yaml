@@ -113,6 +113,8 @@ backend-report:
     limits:
       cpu: "250m"
       memory: "256Mi"
+
+
 infra:
   postgresql:
     ### Опишите необходимые переменные для развертывания PostgresQL в кластере Kubernetes
@@ -124,8 +126,9 @@ infra:
       persistence:
         enabled: true
         size: 2Gi
-    architecture: standalone
-    containerPort: 5432
+  architecture: standalone
+  containerPort: 5432
+
   mongodb:
     env:
       MONGO_INITDB_ROOT_USERNAME: root
