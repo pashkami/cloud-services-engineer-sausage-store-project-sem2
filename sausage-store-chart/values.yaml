@@ -89,6 +89,7 @@ backend:
 ### DB положите в Secret, PORT в ConfigMap
 ### Опишите HPA для backend-report
 backend-report:
+  replicas: 1
   strategy:
     type: Recreate
   image: pashkami/sausage-backend-report
@@ -101,6 +102,7 @@ backend-report:
   service:
     type: ClusterIP
     port: 8081
+  revisionHistoryLimit: 15
   hpa:
     enabled: true
     minReplicas: 1
@@ -113,7 +115,6 @@ backend-report:
     limits:
       cpu: "250m"
       memory: "256Mi"
-
 
 infra:
   postgresql:

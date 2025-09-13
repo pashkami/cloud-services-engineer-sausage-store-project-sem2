@@ -62,3 +62,42 @@ metadata:
 data:
   MONGO_INITDB_ROOT_USERNAME: {{ .Values.infra.mongodb.env.MONGO_INITDB_ROOT_USERNAME }}
   MONGO_INITDB_ROOT_PASSWORD: {{ .Values.infra.mongodb.env.MONGO_INITDB_ROOT_PASSWORD }}
+
+--- 
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: mongodb-init
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+      - name: mongo-init
+        image: mongo:7.0
+        command:
+          - "mongosh"
+          - "--host"
+          - "mongodb"
+          - "-u"
+          - "$(MONGO_INITDB_ROOT_USERNAME)"
+          - "-p"
+          - "$(MONGO_INITDB_ROOT_PASSWORD)"
+          - "--authenticationDatabase"
+          - "admin"
+          - "--eval"
+          - |
+            db = db.getSiblingDB("sausage-store");
+            db.createUser({
+              user: "reports",
+              pwd: "reportspassword",
+              roles: [{ role: "readWrite", db: "sausage-store" }]
+            });
+        envFrom:
+          - configMapRef:
+              name: mongodb-conf
