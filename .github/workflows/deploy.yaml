@@ -123,5 +123,4 @@ jobs:
 
       - name: Deploy Helm Chart
         run: |
-          helm upgrade --install sausage-store chartmuseum/sausage-store 
-            --namespace $SAUSAGE_STORE_NAMESPACE \
+          helm upgrade --install sausage-store chartmuseum/sausage-store -n $SAUSAGE_STORE_NAMESPACE \
