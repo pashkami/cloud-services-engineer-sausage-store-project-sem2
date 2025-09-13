@@ -2,6 +2,7 @@ global:
   imagePullPolicy: Always
   environment: production
 
+
   ###vault:
   ###  host: ip
   ###  name: vault
@@ -92,7 +93,7 @@ backend-report:
   replicas: 1
   strategy:
     type: Recreate
-  image: pashkami/sausage-backend-report
+  image: pashkami/sausage-backend-report:latest
   imagePullPolicy: Always
   containerPort: 8081
   config:
