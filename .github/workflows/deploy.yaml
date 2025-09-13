@@ -108,6 +108,7 @@ jobs:
 
       - name: Add Nexus Helm repository
         run: |
+          echo ${{ env.NEXUS_HELM_REPO }}
           helm repo add chartmuseum ${{ env.NEXUS_HELM_REPO }} \
             --username ${{ env.NEXUS_HELM_REPO_USER }} \
             --password ${{ env.NEXUS_HELM_REPO_PASSWORD }}
