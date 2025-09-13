@@ -84,15 +84,16 @@ jobs:
             helm dependency update
             helm package . -d ./packages
 
-        # - name: Push chart to Nexus
-        #   env:
-        #     NEXUS_HELM_REPO: $NEXUS_HELM_REPO
-        #     NEXUS_HELM_REPO_USER: ${{ secrets.NEXUS_HELM_REPO_USER }}
-        #     NEXUS_HELM_REPO_PASSWORD: ${{ secrets.NEXUS_HELM_REPO_PASSWORD }}
-        #   run: |
-            # helm push ./sausage-store-chart/packages/*.tgz oci://$NEXUS_HELM_REPO \
-            #   --username $NEXUS_HELM_REPO_USER \
-            #   --password $NEXUS_HELM_REPO_PASSWORD
+        - name: Push chart to Nexus
+          env:
+            NEXUS_HELM_REPO: $NEXUS_HELM_REPO
+            NEXUS_HELM_REPO_USER: ${{ secrets.NEXUS_HELM_REPO_USER }}
+            NEXUS_HELM_REPO_PASSWORD: ${{ secrets.NEXUS_HELM_REPO_PASSWORD }}
+          run: |
+            helm plugin install https://github.com/chartmuseum/helm-push
+            helm repo add chartmuseum ${{ secrets.NEXUS_HELM_REPO }} --username ${{ secrets.NEXUS_HELM_REPO_USER }} --password ${{ secrets.NEXUS_HELM_REPO_PASSWORD }}
+            cd sausage-store-chart
+            helm cm-push sausage-store-*.tgz "${{ env.NEXUS_HELM_REPO }}" --context-path="/repository/tazetdinov_helm" --username="${{ env.NEXUS_HELM_REPO_USER }}" --password="${{ env.NEXUS_HELM_REPO_PASSWORD }}"
 
 
 
