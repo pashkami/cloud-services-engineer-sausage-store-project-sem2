@@ -95,18 +95,32 @@ jobs:
               --upload-file *.tgz \
               https://nexus.cloud-services-engineer.education-services.ru/repository/tazetdinov_helm/
 
+  deploy_helm_chart_to_kubernetes:
+    name: Deploy Helm Chart To Kubernetes
+    runs-on: ubuntu-latest
+    needs: add_helm_chart_to_nexus
+
+    steps:
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.12.3
+
+      - name: Add Nexus Helm repository
+        run: |
+          helm repo add chartmuseum ${{ env.NEXUS_HELM_REPO }} \
+            --username ${{ env.NEXUS_HELM_REPO_USER }} \
+            --password ${{ env.NEXUS_HELM_REPO_PASSWORD }}
+          helm repo update
+
+      - name: Add kubeconfig
+        run: |
+          mkdir -p ~/.kube
+          echo "${KUBE_CONFIG}" | base64 -d > ~/.kube/config
+          chmod 600 ~/.kube/config
+          kubectl config get-contexts
 
 
-
-
-      #### Опишите необходимые шаги
-
-  # # Деплоим приложения в кластер Kubernetes с помощью helm-чарт
-  # deploy_helm_chart_to_kubernetes:
-  #     name: Deploy Helm Chart To Kubernetes
-  #     runs-on: ubuntu-latest
-  #     needs: add_helm_chart_to_nexus
-
-  #     steps:
-  #     #### Опишите необходимые шаги
-  ###############################################
+      - name: Deploy Helm Chart
+        run: |
+          helm upgrade --install sausage-store chartmuseum/sausage-store
