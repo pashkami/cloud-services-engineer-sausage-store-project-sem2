@@ -9,9 +9,9 @@ env:
   NEXUS_HELM_REPO: ${{ secrets.NEXUS_HELM_REPO }}
   NEXUS_HELM_REPO_USER: ${{ secrets.NEXUS_HELM_REPO_USER }}
   NEXUS_HELM_REPO_PASSWORD: ${{ secrets.NEXUS_HELM_REPO_PASSWORD }}
-  SAUSAGE_STORE_NAMESPACE: YOUR_NAMESPACE
+  SAUSAGE_STORE_NAMESPACE: r-devops-magistracy-project-2sem-560459702
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
-  VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
+  # VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
 
 jobs:
   # Сборка и пуш образов в докерхаб:
@@ -63,20 +63,48 @@ jobs:
             context: ./backend-report/
             push: true
             tags: ${{ secrets.DOCKER_USER }}/sausage-backend-report:latest
+
   # Упаковываем helm-чарт и пушим его в Nexus
   add_helm_chart_to_nexus:
       name: Add Helm Chart To Nexus
       runs-on: ubuntu-latest
       needs: build_and_push_to_docker_hub
-
       steps:
+        - name: Checkout code
+          uses: actions/checkout@v3
+        
+        - name: Set up Helm
+          uses: azure/setup-helm@v3
+          with:
+            version: v3.12.3
+
+        - name: Package chart
+          run: |
+            cd sausage-store-chart
+            helm dependency update
+            helm package . -d ./packages
+
+        # - name: Push chart to Nexus
+        #   env:
+        #     NEXUS_HELM_REPO: $NEXUS_HELM_REPO
+        #     NEXUS_HELM_REPO_USER: ${{ secrets.NEXUS_HELM_REPO_USER }}
+        #     NEXUS_HELM_REPO_PASSWORD: ${{ secrets.NEXUS_HELM_REPO_PASSWORD }}
+        #   run: |
+            # helm push ./sausage-store-chart/packages/*.tgz oci://$NEXUS_HELM_REPO \
+            #   --username $NEXUS_HELM_REPO_USER \
+            #   --password $NEXUS_HELM_REPO_PASSWORD
+
+
+
+
       #### Опишите необходимые шаги
 
-  # Деплоим приложения в кластер Kubernetes с помощью helm-чарт
-  deploy_helm_chart_to_kubernetes:
-      name: Deploy Helm Chart To Kubernetes
-      runs-on: ubuntu-latest
-      needs: add_helm_chart_to_nexus
+  # # Деплоим приложения в кластер Kubernetes с помощью helm-чарт
+  # deploy_helm_chart_to_kubernetes:
+  #     name: Deploy Helm Chart To Kubernetes
+  #     runs-on: ubuntu-latest
+  #     needs: add_helm_chart_to_nexus
 
-      steps:
-      #### Опишите необходимые шаги
+  #     steps:
+  #     #### Опишите необходимые шаги
+  ###############################################
