@@ -109,6 +109,7 @@ backend-report:
     minReplicas: 1
     maxReplicas: 5
     targetCPUUtilizationPercentage: 75
+    targetMemoryUtilizationPercentage: 80
   resources:
     requests:
       cpu: "100m"
