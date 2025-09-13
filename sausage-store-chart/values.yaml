@@ -128,8 +128,8 @@ infra:
       persistence:
         enabled: true
         size: 2Gi
-  architecture: standalone
-  containerPort: 5432
+    architecture: standalone
+    containerPort: 5432
 
   mongodb:
     env:
