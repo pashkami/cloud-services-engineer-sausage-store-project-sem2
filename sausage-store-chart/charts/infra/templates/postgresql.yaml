@@ -21,7 +21,7 @@ spec:
           - configMapRef:
               name: postgresql-conf
         ports:
-        - containerPort: {{ .Values.postgresql.containerPort }}
+        - containerPort: {{ .Values.infra.postgresql.containerPort }}
         resources:
           requests:
             memory: "128Mi"
@@ -49,8 +49,8 @@ metadata:
     app: postgresql
 spec:
   ports:
-  - port: {{ .Values.postgresql.containerPort }}
-    targetPort: {{ .Values.postgresql.containerPort }}
+  - port: {{ .Values.infra.postgresql.containerPort }}
+    targetPort: {{ .Values.infra.postgresql.containerPort }}
   selector:
     app: postgresql
   clusterIP: None
@@ -60,6 +60,6 @@ kind: ConfigMap
 metadata:
   name: postgresql-conf
 data:
-  POSTGRES_USER: {{ .Values.postgresql.auth.username }}
-  POSTGRES_PASSWORD: {{ .Values.postgresql.auth.password }}
-  POSTGRES_DB: {{ .Values.postgresql.auth.database }}
+  POSTGRES_USER: {{ .Values.infra.postgresql.auth.username }}
+  POSTGRES_PASSWORD: {{ .Values.infra.postgresql.auth.password }}
+  POSTGRES_DB: {{ .Values.infra.postgresql.auth.database }}
