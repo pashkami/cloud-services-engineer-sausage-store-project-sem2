@@ -108,7 +108,6 @@ jobs:
 
       - name: Add Nexus Helm repository
         run: |
-          echo ${{ env.NEXUS_HELM_REPO }}
           helm repo add chartmuseum ${{ env.NEXUS_HELM_REPO }} \
             --username ${{ env.NEXUS_HELM_REPO_USER }} \
             --password ${{ env.NEXUS_HELM_REPO_PASSWORD }}
@@ -117,7 +116,7 @@ jobs:
       - name: Add kubeconfig
         run: |
           mkdir -p ~/.kube
-          echo "${KUBE_CONFIG}" | base64 -d > ~/.kube/config
+          echo "${KUBE_CONFIG}" >> ~/.kube/config
           chmod 600 ~/.kube/config
           kubectl config get-contexts
 
