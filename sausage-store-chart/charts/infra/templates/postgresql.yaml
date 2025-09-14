@@ -20,6 +20,8 @@ spec:
         envFrom:
           - configMapRef:
               name: postgresql-conf
+          - secretRef:
+              name: postgresql-secret
         ports:
         - containerPort: {{ .Values.postgresql.containerPort }}
         resources:
@@ -61,5 +63,15 @@ metadata:
   name: postgresql-conf
 data:
   POSTGRES_USER: {{ .Values.postgresql.auth.username }}
-  POSTGRES_PASSWORD: {{ .Values.postgresql.auth.password }}
+  # POSTGRES_PASSWORD: {{ .Values.postgresql.auth.password }}
   POSTGRES_DB: {{ .Values.postgresql.auth.database }}
+
+--- 
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgresql-secret
+type: Opaque
+stringData:
+  POSTGRES_PASSWORD: {{ .Values.infra.postgresql.auth.password }}
