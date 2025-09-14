@@ -123,4 +123,6 @@ jobs:
 
       - name: Deploy Helm Chart
         run: |
-          helm upgrade --install sausage-store chartmuseum/sausage-store -n $SAUSAGE_STORE_NAMESPACE \
+          helm upgrade --install sausage-store chartmuseum/sausage-store \
+            -n r-devops-magistracy-project-2sem-560459702 \
+            --history-max 2

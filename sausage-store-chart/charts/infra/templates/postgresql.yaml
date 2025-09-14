@@ -85,3 +85,4 @@ metadata:
 type: Opaque
 stringData:
   POSTGRES_PASSWORD: {{ .Values.postgresql.auth.password }}
+
