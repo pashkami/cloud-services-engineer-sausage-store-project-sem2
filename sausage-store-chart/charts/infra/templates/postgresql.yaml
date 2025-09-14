@@ -17,6 +17,9 @@ spec:
       containers:
       - name: postgresql
         image: postgres:15
+        env:
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
         envFrom:
           - configMapRef:
               name: postgresql-conf-{{ .Release.Name }}
