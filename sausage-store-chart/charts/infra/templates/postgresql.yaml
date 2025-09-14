@@ -19,9 +19,9 @@ spec:
         image: postgres:15
         envFrom:
           - configMapRef:
-              name: postgresql-conf
+              name: postgresql-conf-{{ .Release.Name }}
           - secretRef:
-              name: postgresql-secret
+              name: postgresql-secret-{{ .Release.Name }}
         ports:
         - containerPort: {{ .Values.postgresql.containerPort }}
         resources:
@@ -60,7 +60,7 @@ spec:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: postgresql-conf
+  name: postgresql-conf-{{ .Release.Name }}
 data:
   POSTGRES_USER: {{ .Values.postgresql.auth.username }}
   # POSTGRES_PASSWORD: {{ .Values.postgresql.auth.password }}
