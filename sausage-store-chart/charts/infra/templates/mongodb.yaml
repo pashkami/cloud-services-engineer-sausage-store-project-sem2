@@ -55,6 +55,21 @@ spec:
     app: mongodb
   clusterIP: None
 ---
+# Client Service (для приложений)
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongodb-client
+  labels:
+    app: mongodb
+spec:
+  type: ClusterIP
+  ports:
+    - port: {{ .Values.mongodb.containerPort }}
+      targetPort: {{ .Values.mongodb.containerPort }}
+  selector:
+    app: mongodb
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -83,7 +98,7 @@ spec:
         command:
           - "mongosh"
           - "--host"
-          - "mongodb"
+          - "mongodb-client"
           - "-u"
           - "$(MONGO_INITDB_ROOT_USERNAME)"
           - "-p"
