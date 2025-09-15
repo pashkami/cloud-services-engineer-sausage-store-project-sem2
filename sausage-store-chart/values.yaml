@@ -96,7 +96,7 @@ backend-report:
   imagePullPolicy: Always
   containerPort: 8080
   config:
-    port: "8081"
+    port: "8080"
   secret:
     db: "mongodb://root:rootpassword@mongodb:27017"
   service:
