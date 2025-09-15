@@ -99,7 +99,7 @@ backend-report:
   config:
     port: "8080"
   secret:
-    db: "mongodb://reports:reportspassword@mongodb:27017"
+    db: "mongodb://reports:reportspassword@mongodb:27017/sausage-store"
   service:
     type: ClusterIP
     port: 8080
