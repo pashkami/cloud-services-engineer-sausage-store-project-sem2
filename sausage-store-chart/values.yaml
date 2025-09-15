@@ -69,7 +69,7 @@ backend:
     httpGet:
       path: /actuator/health
       port: 8080
-    initialDelaySeconds: 30
+    initialDelaySeconds: 90
     periodSeconds: 10
     timeoutSeconds: 5
     successThreshold: 1
