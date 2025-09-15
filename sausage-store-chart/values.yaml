@@ -72,9 +72,10 @@ backend:
     initialDelaySeconds: 30
     periodSeconds: 10
     timeoutSeconds: 5
+    successThreshold: 1
     failureThreshold: 3
   vpa:
-    enabled: false
+    enabled: true
     updateMode: "Off"
     minAllowed:
       cpu: 100m
