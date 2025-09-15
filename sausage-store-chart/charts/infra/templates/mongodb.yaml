@@ -73,7 +73,11 @@ metadata:
     "helm.sh/hook-weight": "5"
     "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
 spec:
-  template:
+  template:    
+    metadata:
+      labels:
+        app.kubernetes.io/name: mongodb-init
+        app.kubernetes.io/instance: "{{ .Release.Name }}"
     spec:
       restartPolicy: OnFailure
       containers:
@@ -84,9 +88,9 @@ spec:
           - "--host"
           - "mongodb"
           - "-u"
-          - "$(MONGO_INITDB_ROOT_USERNAME)"
+          - "{{ .Values.mongodb.env.MONGO_INITDB_ROOT_USERNAME }}"
           - "-p"
-          - "$(MONGO_INITDB_ROOT_PASSWORD)"
+          - "{{ .Values.mongodb.env.MONGO_INITDB_ROOT_PASSWORD }}"
           - "--authenticationDatabase"
           - "admin"
           - "--eval"
